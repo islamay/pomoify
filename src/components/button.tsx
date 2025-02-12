@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-    "flex items-center rounded cursor-pointer transition-colors",
+    "flex items-center justify-center rounded cursor-pointer transition-colors",
     {
         variants: {
             variant: {
