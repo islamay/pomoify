@@ -1,9 +1,7 @@
 import { RotateCcw, SkipForward } from "lucide-react";
 import { Button } from "./button";
-import { useState } from "react";
 import clsx from "clsx";
-
-type Phase = "focus" | "break" | "long-break";
+import { usePomodoro } from "./provider/pomodoro-provider";
 
 type PhaseProps = {
     children: React.ReactNode;
@@ -31,7 +29,7 @@ function Phase({ children, isActive, onClick }: PhaseProps) {
 interface PhasesProps extends React.HTMLProps<HTMLDivElement> {}
 
 function Phases({ className, ...props }: PhasesProps) {
-    const [phase, setPhase] = useState<Phase>("focus");
+    const { phase, setPhase, focusCounter } = usePomodoro();
 
     return (
         <div
@@ -61,6 +59,8 @@ function Phases({ className, ...props }: PhasesProps) {
 }
 
 function Pomodoro() {
+    const { duration, isRunning, focusCounter, setIsRunning } = usePomodoro();
+
     return (
         <section
             aria-label="Pomodoro timer section"
@@ -73,7 +73,7 @@ function Pomodoro() {
             <Phases className="mt-2" />
 
             <h1 className="mt-8 text-[4rem] text-center font-mono font-medium">
-                25:00
+                {duration.minutes}:{duration.seconds}
             </h1>
 
             <div
@@ -83,14 +83,20 @@ function Pomodoro() {
                 <Button variant="ghost" size="icon">
                     <RotateCcw size={16} strokeWidth={1} />
                 </Button>
-                <Button size="large">Start</Button>
+                <Button
+                    size="large"
+                    variant={isRunning ? "secondary" : "default"}
+                    onClick={() => setIsRunning((prev) => !prev)}
+                >
+                    {isRunning ? "Pause" : "Start"}
+                </Button>
                 <Button variant="ghost" size="icon">
                     <SkipForward size={16} strokeWidth={1} />
                 </Button>
             </div>
 
             <p className="mt-4 text-center text-sm text-secondary-foreground">
-                You have focused 0 time
+                You have focused {focusCounter} time
             </p>
         </section>
     );

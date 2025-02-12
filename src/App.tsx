@@ -1,12 +1,15 @@
 import React from "react";
 import { Navbar } from "./components/navbar";
 import { Pomodoro } from "./components/pomodoro";
+import { PomodoroProvider } from "./components/provider/pomodoro-provider";
 
 function App() {
     return (
         <React.Fragment>
             <Navbar />
-            <Pomodoro />
+            <PomodoroProvider>
+                <Pomodoro />
+            </PomodoroProvider>
         </React.Fragment>
     );
 }
