@@ -32,11 +32,14 @@ interface ButtonProps
     asChild?: boolean;
 }
 
-function Button({ asChild, variant, size, ...props }: ButtonProps) {
+function Button({ asChild, variant, size, className, ...props }: ButtonProps) {
     const Comp = asChild ? Slot : "button";
 
     return (
-        <Comp className={cn(buttonVariants({ variant, size }))} {...props} />
+        <Comp
+            className={cn(buttonVariants({ variant, size, className }))}
+            {...props}
+        />
     );
 }
 
