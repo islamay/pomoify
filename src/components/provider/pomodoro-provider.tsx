@@ -108,12 +108,9 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
 
     useEffect(() => {
         if (showNotification) {
-            console.log("playing audio");
-
             notificationAudio.loop = true;
             notificationAudio.play();
         } else {
-            console.log("stoppings audio");
             notificationAudio.currentTime = 0;
             notificationAudio.pause();
             console.log(notificationAudio.paused);
