@@ -4,9 +4,9 @@ import React, {
     useContext,
     useEffect,
     useMemo,
-    useRef,
     useState,
 } from "react";
+import notificationMp3 from "@/assets/notification.mp3";
 
 type Phase = "focus" | "break" | "long-break";
 
@@ -28,6 +28,7 @@ type PomodoroContext = {
     setPhase: React.Dispatch<SetStateAction<Phase>>;
     setIsRunning: React.Dispatch<SetStateAction<boolean>>;
     setShowNotification: React.Dispatch<SetStateAction<boolean>>;
+    nextPhase: () => void;
 };
 
 const PomodoroContext = createContext<PomodoroContext>({
@@ -43,6 +44,7 @@ const PomodoroContext = createContext<PomodoroContext>({
     setPhase() {},
     setIsRunning() {},
     setShowNotification() {},
+    nextPhase() {},
 });
 
 type PomodoroProviderProps = {
@@ -64,6 +66,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
         else return LONG_BREAK_DURATION;
     }, [phase]);
 
+    const [notificationAudio] = useState(new Audio(notificationMp3));
     const [duration, setDuration] = useState(initialDuration);
     const [isDone, setIsDone] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
@@ -100,7 +103,22 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
         setIsRunning(false);
         setIsDone(false);
         setDuration(initialDuration);
+        setShowNotification(false);
     }
+
+    useEffect(() => {
+        if (showNotification) {
+            console.log("playing audio");
+
+            notificationAudio.loop = true;
+            notificationAudio.play();
+        } else {
+            console.log("stoppings audio");
+            notificationAudio.currentTime = 0;
+            notificationAudio.pause();
+            console.log(notificationAudio.paused);
+        }
+    }, [showNotification]);
 
     useEffect(() => {
         resetTimer();
@@ -108,8 +126,10 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
-        if (duration === 0) {
-            nextPhase();
+        if (isRunning && duration === 0) {
+            setIsDone(true);
+            setShowNotification(true);
+            setIsRunning(false);
         }
 
         if (isRunning && duration !== 0) {
@@ -136,6 +156,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
                 setPhase,
                 setIsRunning,
                 setShowNotification,
+                nextPhase,
             }}
         >
             {children}

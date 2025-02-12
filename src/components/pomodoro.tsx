@@ -29,7 +29,7 @@ function Phase({ children, isActive, onClick }: PhaseProps) {
 interface PhasesProps extends React.HTMLProps<HTMLDivElement> {}
 
 function Phases({ className, ...props }: PhasesProps) {
-    const { phase, setPhase, focusCounter } = usePomodoro();
+    const { phase, setPhase } = usePomodoro();
 
     return (
         <div
@@ -59,7 +59,14 @@ function Phases({ className, ...props }: PhasesProps) {
 }
 
 function Pomodoro() {
-    const { duration, isRunning, focusCounter, setIsRunning } = usePomodoro();
+    const {
+        duration,
+        isRunning,
+        isDone,
+        focusCounter,
+        setIsRunning,
+        nextPhase,
+    } = usePomodoro();
 
     return (
         <section
@@ -83,13 +90,19 @@ function Pomodoro() {
                 <Button variant="ghost" size="icon">
                     <RotateCcw size={16} strokeWidth={1} />
                 </Button>
-                <Button
-                    size="large"
-                    variant={isRunning ? "secondary" : "default"}
-                    onClick={() => setIsRunning((prev) => !prev)}
-                >
-                    {isRunning ? "Pause" : "Start"}
-                </Button>
+                {isDone ? (
+                    <Button size="large" onClick={nextPhase}>
+                        Next Phase
+                    </Button>
+                ) : (
+                    <Button
+                        size="large"
+                        variant={isRunning ? "secondary" : "default"}
+                        onClick={() => setIsRunning((prev) => !prev)}
+                    >
+                        {isRunning ? "Pause" : "Start"}
+                    </Button>
+                )}
                 <Button variant="ghost" size="icon">
                     <SkipForward size={16} strokeWidth={1} />
                 </Button>
