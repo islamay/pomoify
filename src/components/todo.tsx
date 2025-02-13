@@ -1,30 +1,42 @@
 import clsx from "clsx";
 import { Button } from "./button";
 import { Checkbox } from "./ui/checkbox";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Todo as TodoPrimitive, useTodo } from "./provider/todo-provider";
-import { Minus, Trash } from "lucide-react";
+import { Minus } from "lucide-react";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 interface TaskProps extends TodoPrimitive {}
 
-function Task({ id, isDone: isDoneInitial, name }: TaskProps) {
-    const { deleteTodo } = useTodo();
-    const [isDone, setIsDone] = useState(isDoneInitial);
+function Task({ id, isDone, name }: TaskProps) {
+    const { deleteTodo, updateTodo } = useTodo();
 
     function deleteHandler() {
         deleteTodo(id);
     }
 
+    function onTaskNameChange(e: ChangeEvent<HTMLInputElement>) {
+        updateTodo(id, {
+            id,
+            isDone,
+            name: e.currentTarget.value,
+        });
+    }
+
+    function onTaskStatusChange(checked: CheckedState) {
+        updateTodo(id, {
+            id,
+            name,
+            isDone: checked === "indeterminate" ? false : checked,
+        });
+    }
+
     return (
         <div className="flex items-center gap-2 focus-within:bg-secondary hover:bg-secondary p-2 rounded transition-colors">
-            <Checkbox
-                checked={isDone}
-                onCheckedChange={(checked) =>
-                    setIsDone(checked === "indeterminate" ? false : checked)
-                }
-            />
+            <Checkbox checked={isDone} onCheckedChange={onTaskStatusChange} />
             <input
                 type="text"
+                onChange={onTaskNameChange}
                 className={clsx("outline-0 transition-colors grow", {
                     "text-secondary-foreground line-through": isDone,
                 })}
