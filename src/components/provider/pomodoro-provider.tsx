@@ -25,6 +25,12 @@ type PomodoroContext = {
         minutes: string;
         seconds: string;
     };
+    settings: {
+        focus: number;
+        break: number;
+        longBreak: number;
+        longBreakInterval: number;
+    };
     setPhase: React.Dispatch<SetStateAction<Phase>>;
     setIsRunning: React.Dispatch<SetStateAction<boolean>>;
     setShowNotification: React.Dispatch<SetStateAction<boolean>>;
@@ -41,6 +47,12 @@ const PomodoroContext = createContext<PomodoroContext>({
         minutes: "25",
         seconds: "00",
     },
+    settings: {
+        focus: FOCUS_DURATION,
+        break: BREAK_DURATION,
+        longBreak: LONG_BREAK_DURATION,
+        longBreakInterval: LONG_BREAK_AFTER,
+    },
     setPhase() {},
     setIsRunning() {},
     setShowNotification() {},
@@ -51,8 +63,12 @@ type PomodoroProviderProps = {
     children: React.ReactNode;
 };
 
-function shouldBeLongBreak(currentPhase: Phase, focusCounter: number) {
-    if (currentPhase === "focus" && focusCounter % LONG_BREAK_AFTER === 0) {
+function shouldBeLongBreak(
+    currentPhase: Phase,
+    focusCounter: number,
+    longBreakInterval: number
+) {
+    if (currentPhase === "focus" && focusCounter % longBreakInterval === 0) {
         return true;
     } else return false;
 }
@@ -60,10 +76,17 @@ function shouldBeLongBreak(currentPhase: Phase, focusCounter: number) {
 function PomodoroProvider({ children }: PomodoroProviderProps) {
     const [phase, setPhase] = useState<Phase>("focus");
     const [isRunning, setIsRunning] = useState(false);
+    const [settings, setDurations] = useState({
+        focus: FOCUS_DURATION,
+        break: BREAK_DURATION,
+        longBreak: LONG_BREAK_DURATION,
+        longBreakInterval: LONG_BREAK_AFTER,
+    });
+
     const initialDuration = useMemo(() => {
-        if (phase === "focus") return FOCUS_DURATION;
-        else if (phase === "break") return BREAK_DURATION;
-        else return LONG_BREAK_DURATION;
+        if (phase === "focus") return settings.focus * 60;
+        else if (phase === "break") return settings.break * 60;
+        else return settings.longBreak * 60;
     }, [phase]);
 
     const [notificationAudio] = useState(new Audio(notificationMp3));
@@ -92,7 +115,13 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
             if (prev === "focus") {
                 const updatedFocusCounter = focusCounter + 1;
                 setFocusCounter(updatedFocusCounter);
-                if (shouldBeLongBreak(prev, updatedFocusCounter))
+                if (
+                    shouldBeLongBreak(
+                        prev,
+                        updatedFocusCounter,
+                        settings.longBreakInterval
+                    )
+                )
                     return "long-break";
                 else return "break";
             } else return "focus";
@@ -150,6 +179,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
                 showNotification,
                 focusCounter,
                 duration: { minutes, seconds },
+                settings,
                 setPhase,
                 setIsRunning,
                 setShowNotification,
