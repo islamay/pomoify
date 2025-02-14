@@ -7,13 +7,30 @@ import React, {
     useState,
 } from "react";
 import notificationMp3 from "@/assets/notification.mp3";
+import { z } from "zod";
 
 type Phase = "focus" | "break" | "long-break";
 
-const FOCUS_DURATION = 1;
-const BREAK_DURATION = 1;
-const LONG_BREAK_DURATION = 1;
+const FOCUS_DURATION = 25;
+const BREAK_DURATION = 5;
+const LONG_BREAK_DURATION = 15;
 const LONG_BREAK_AFTER = 4;
+
+const settingsSchema = z.object({
+    focus: z.number(),
+    break: z.number(),
+    longBreak: z.number(),
+    longBreakInterval: z.number(),
+});
+
+type Settings = z.infer<typeof settingsSchema>;
+
+const defaultSettings: Settings = {
+    focus: FOCUS_DURATION,
+    break: BREAK_DURATION,
+    longBreak: LONG_BREAK_DURATION,
+    longBreakInterval: LONG_BREAK_AFTER,
+};
 
 type PomodoroContext = {
     phase: Phase;
@@ -25,15 +42,11 @@ type PomodoroContext = {
         minutes: string;
         seconds: string;
     };
-    settings: {
-        focus: number;
-        break: number;
-        longBreak: number;
-        longBreakInterval: number;
-    };
+    settings: Settings;
     setPhase: React.Dispatch<SetStateAction<Phase>>;
     setIsRunning: React.Dispatch<SetStateAction<boolean>>;
     setShowNotification: React.Dispatch<SetStateAction<boolean>>;
+    setSettings: React.Dispatch<SetStateAction<Settings>>;
     nextPhase: () => void;
 };
 
@@ -57,11 +70,31 @@ const PomodoroContext = createContext<PomodoroContext>({
     setIsRunning() {},
     setShowNotification() {},
     nextPhase() {},
+    setSettings() {},
 });
 
 type PomodoroProviderProps = {
     children: React.ReactNode;
 };
+
+const SETTINGS_ADDRESS = "settings";
+
+function getSettingsFromLocalStorage(): Settings {
+    const data = localStorage.getItem(SETTINGS_ADDRESS);
+    if (!data) return defaultSettings;
+
+    try {
+        const parsed = JSON.parse(data);
+        return settingsSchema.parse(parsed);
+    } catch (error) {
+        return defaultSettings;
+    }
+}
+
+function saveSettingsToLocalStorage(newSettings: Settings) {
+    const data = JSON.stringify(newSettings);
+    localStorage.setItem(SETTINGS_ADDRESS, data);
+}
 
 function shouldBeLongBreak(
     currentPhase: Phase,
@@ -76,18 +109,15 @@ function shouldBeLongBreak(
 function PomodoroProvider({ children }: PomodoroProviderProps) {
     const [phase, setPhase] = useState<Phase>("focus");
     const [isRunning, setIsRunning] = useState(false);
-    const [settings, setDurations] = useState({
-        focus: FOCUS_DURATION,
-        break: BREAK_DURATION,
-        longBreak: LONG_BREAK_DURATION,
-        longBreakInterval: LONG_BREAK_AFTER,
-    });
+    const [settings, setSettings] = useState<Settings>(
+        getSettingsFromLocalStorage()
+    );
 
     const initialDuration = useMemo(() => {
         if (phase === "focus") return settings.focus * 60;
         else if (phase === "break") return settings.break * 60;
         else return settings.longBreak * 60;
-    }, [phase]);
+    }, [phase, settings]);
 
     const [notificationAudio] = useState(new Audio(notificationMp3));
     const [duration, setDuration] = useState(initialDuration);
@@ -136,6 +166,10 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
     }
 
     useEffect(() => {
+        saveSettingsToLocalStorage(settings);
+    }, [settings]);
+
+    useEffect(() => {
         if (showNotification) {
             notificationAudio.loop = true;
             notificationAudio.play();
@@ -148,7 +182,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
 
     useEffect(() => {
         resetTimer();
-    }, [phase]);
+    }, [phase, settings]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -184,6 +218,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
                 setIsRunning,
                 setShowNotification,
                 nextPhase,
+                setSettings,
             }}
         >
             {children}

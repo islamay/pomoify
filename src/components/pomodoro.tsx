@@ -4,16 +4,14 @@ import clsx from "clsx";
 import { usePomodoro } from "./provider/pomodoro-provider";
 import {
     Dialog,
-    DialogClose,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "./ui/dialog";
 import { DialogContent } from "./ui/dialog";
-import { Input } from "./ui/input";
-import { ChangeEvent } from "react";
+import { PomodoroSettingForm } from "./forms/pomodoro-setting-form";
+import { Separator } from "./ui/separator";
 
 type PhaseProps = {
     children: React.ReactNode;
@@ -70,43 +68,9 @@ function Phases({ className, ...props }: PhasesProps) {
     );
 }
 
-interface PomodoroDurationInputProps extends React.HTMLProps<HTMLInputElement> {
-    id: string;
-    label: string;
-    unit: string;
-}
-function PomodoroDurationInput({
-    label,
-    id,
-    unit,
-    ...props
-}: PomodoroDurationInputProps) {
-    return (
-        <div className="grid grid-cols-5 items-center gap-4">
-            <label className="col-span-2" htmlFor={id}>
-                {label}
-            </label>
-            <div className="grid grid-cols-5 col-span-3 ">
-                <Input
-                    id={id}
-                    type="number"
-                    className="col-span-4 rounded-r-none"
-                    {...props}
-                />
-                <div className="bg-secondary content-center px-2 border border-border rounded-r">
-                    <p className="text-secondary-foreground text-sm truncate">
-                        {unit}
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
-}
-
 function Pomodoro() {
     const {
         duration,
-        settings,
         isRunning,
         isDone,
         focusCounter,
@@ -131,45 +95,10 @@ function Pomodoro() {
                         <DialogHeader>
                             <DialogTitle>Pomodoro settings</DialogTitle>
                             <DialogDescription>
-                                Change timer duration and behavior based on your
-                                need
+                                Change timer duration and behavior
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="flex flex-col gap-4">
-                            <PomodoroDurationInput
-                                id="focus-duration-setting"
-                                label="Focus duration"
-                                defaultValue={settings.focus}
-                                unit="Minutes"
-                            />
-                            <PomodoroDurationInput
-                                id="break-duration-setting"
-                                label="Break duration"
-                                defaultValue={settings.break}
-                                unit="Minutes"
-                            />
-                            <PomodoroDurationInput
-                                id="focus-duration-setting"
-                                label="Long break duration"
-                                defaultValue={settings.longBreak}
-                                unit="Minutes"
-                            />
-                            <PomodoroDurationInput
-                                id="long-break-interval-setting"
-                                label="Long break after"
-                                defaultValue={settings.longBreakInterval}
-                                unit="Phase"
-                            />
-
-                            <DialogFooter className="flex gap-4 justify-end mt-8">
-                                <DialogClose asChild>
-                                    <Button variant="ghost">Cancel</Button>
-                                </DialogClose>
-                                <DialogClose asChild>
-                                    <Button>Save</Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </div>
+                        <PomodoroSettingForm />
                     </DialogContent>
                 </Dialog>
             </div>
