@@ -1,10 +1,12 @@
 import clsx from "clsx";
 import { Button } from "./button";
 import { Checkbox } from "./ui/checkbox";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Todo as TodoPrimitive, useTodo } from "./provider/todo-provider";
-import { Minus } from "lucide-react";
+import { CheckCheck, Ellipsis, Minus, Trash } from "lucide-react";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { PopoverClose } from "@radix-ui/react-popover";
 
 interface TaskProps extends TodoPrimitive {}
 
@@ -50,8 +52,9 @@ function Task({ id, isDone, name }: TaskProps) {
 }
 
 function Todo() {
-    const { todos, addTodo } = useTodo();
+    const { todos, addTodo, clearCompletedTodos, clearTodos } = useTodo();
     const [newTodo, setNewTodo] = useState("");
+    const bottomRef = useRef<HTMLDivElement>(null);
 
     const todoFormHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -60,6 +63,12 @@ function Todo() {
         setNewTodo("");
     };
 
+    useEffect(() => {
+        if (bottomRef.current) {
+            bottomRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [todos]);
+
     return (
         <section
             aria-label="Todo list section"
@@ -67,6 +76,35 @@ function Todo() {
         >
             <div className="flex justify-between items-center">
                 <h3 className="font-semibold">Tasks</h3>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <Ellipsis size={16} strokeWidth={1} />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-1 w-max flex flex-col">
+                        <PopoverClose asChild>
+                            <Button
+                                className="justify-start gap-4"
+                                variant="ghost"
+                                onClick={clearCompletedTodos}
+                            >
+                                <CheckCheck size={16} strokeWidth={1} />
+                                Clear completed task
+                            </Button>
+                        </PopoverClose>
+                        <PopoverClose asChild>
+                            <Button
+                                className="justify-start gap-4"
+                                variant="ghost"
+                                onClick={clearTodos}
+                            >
+                                <Trash size={16} strokeWidth={1} />
+                                Clear all task
+                            </Button>
+                        </PopoverClose>
+                    </PopoverContent>
+                </Popover>
             </div>
 
             <form className="flex gap-2 mt-4" onSubmit={todoFormHandler}>
@@ -90,6 +128,7 @@ function Todo() {
                         />
                     );
                 })}
+                <div ref={bottomRef} />
             </div>
         </section>
     );

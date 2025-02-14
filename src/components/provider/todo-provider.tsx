@@ -15,6 +15,8 @@ type TodoContext = {
     addTodo: (name: string) => void;
     updateTodo: (id: string, newTodo: Todo) => void;
     deleteTodo: (id: string) => void;
+    clearTodos: () => void;
+    clearCompletedTodos: () => void;
 };
 
 const TodoContext = createContext<TodoContext>({
@@ -22,6 +24,8 @@ const TodoContext = createContext<TodoContext>({
     addTodo() {},
     updateTodo() {},
     deleteTodo() {},
+    clearTodos() {},
+    clearCompletedTodos() {},
 });
 
 type TodoProviderProps = {
@@ -74,13 +78,29 @@ function TodoProvider({ children }: TodoProviderProps) {
         setTodos(filteredTodos);
     }
 
+    function clearTodos() {
+        setTodos([]);
+    }
+
+    function clearCompletedTodos() {
+        const filteredTodos = todos.filter((todo) => !todo.isDone);
+        setTodos(filteredTodos);
+    }
+
     useEffect(() => {
         saveTodosToLocalStorage(todos);
     }, [todos]);
 
     return (
         <TodoContext.Provider
-            value={{ todos, addTodo, updateTodo, deleteTodo }}
+            value={{
+                todos,
+                addTodo,
+                updateTodo,
+                deleteTodo,
+                clearTodos,
+                clearCompletedTodos,
+            }}
         >
             {children}
         </TodoContext.Provider>
