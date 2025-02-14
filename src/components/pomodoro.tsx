@@ -2,6 +2,7 @@ import { RotateCcw, Settings, SkipForward } from "lucide-react";
 import { Button } from "./button";
 import clsx from "clsx";
 import { usePomodoro } from "./provider/pomodoro-provider";
+import type { Phase } from "./provider/pomodoro-provider";
 import {
     Dialog,
     DialogDescription,
@@ -38,7 +39,17 @@ function Phase({ children, isActive, onClick }: PhaseProps) {
 interface PhasesProps extends React.HTMLProps<HTMLDivElement> {}
 
 function Phases({ className, ...props }: PhasesProps) {
-    const { phase, setPhase } = usePomodoro();
+    const { phase, isRunning, setPhase } = usePomodoro();
+
+    function handleChangePhase(phase: Phase) {
+        return () => {
+            if (isRunning) {
+                if (confirm("Current phase progress will be lost")) {
+                    setPhase(phase);
+                }
+            } else setPhase(phase);
+        };
+    }
 
     return (
         <div
@@ -47,19 +58,19 @@ function Phases({ className, ...props }: PhasesProps) {
         >
             <Phase
                 isActive={phase === "focus"}
-                onClick={() => setPhase("focus")}
+                onClick={handleChangePhase("focus")}
             >
                 Focus
             </Phase>
             <Phase
                 isActive={phase === "break"}
-                onClick={() => setPhase("break")}
+                onClick={handleChangePhase("break")}
             >
                 Break
             </Phase>
             <Phase
                 isActive={phase === "long-break"}
-                onClick={() => setPhase("long-break")}
+                onClick={handleChangePhase("long-break")}
             >
                 Long Break
             </Phase>

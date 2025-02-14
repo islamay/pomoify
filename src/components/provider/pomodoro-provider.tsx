@@ -234,3 +234,4 @@ function usePomodoro() {
 }
 
 export { PomodoroProvider, usePomodoro };
+export type { Phase };
