@@ -104,6 +104,7 @@ function Pomodoro() {
             aria-label="Pomodoro timer section"
             className="max-w-xl min-[36rem]:px-0 min-[36rem]:mx-auto mt-8 px-8"
         >
+            <title>{`${duration.minutes}:${duration.seconds} Pomoify`}</title>
             <div className="flex justify-between items-center">
                 <h3 className="font-semibold">Phase</h3>
                 <Dialog>
