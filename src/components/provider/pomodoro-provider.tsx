@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import notificationMp3 from "@/assets/notification.mp3";
 import { z } from "zod";
+import { setInterval, clearInterval } from "worker-timers";
 
 type Phase = "focus" | "break" | "long-break";
 
@@ -187,7 +188,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
     }, [phase, settings]);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: number;
         if (isRunning && duration === 0) {
             setIsDone(true);
             setShowNotification(true);
