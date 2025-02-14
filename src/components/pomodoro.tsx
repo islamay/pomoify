@@ -75,7 +75,18 @@ function Pomodoro() {
         focusCounter,
         setIsRunning,
         nextPhase,
+        resetPomodoro,
     } = usePomodoro();
+
+    function onReset() {
+        const reset = confirm("Reset current progress?");
+        if (reset) resetPomodoro();
+    }
+
+    function onSkip() {
+        const skip = confirm("Skip current phase?");
+        if (skip) nextPhase();
+    }
 
     return (
         <section
@@ -112,7 +123,7 @@ function Pomodoro() {
                 aria-label="Timer control"
                 className="mt-8 flex items-center justify-center gap-4"
             >
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" onClick={onReset}>
                     <RotateCcw size={16} strokeWidth={1} />
                 </Button>
                 {isDone ? (
@@ -128,7 +139,7 @@ function Pomodoro() {
                         {isRunning ? "Pause" : "Start"}
                     </Button>
                 )}
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" onClick={onSkip}>
                     <SkipForward size={16} strokeWidth={1} />
                 </Button>
             </div>

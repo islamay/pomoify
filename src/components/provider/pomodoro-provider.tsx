@@ -43,6 +43,7 @@ type PomodoroContext = {
         seconds: string;
     };
     settings: Settings;
+    resetPomodoro: () => void;
     setPhase: React.Dispatch<SetStateAction<Phase>>;
     setIsRunning: React.Dispatch<SetStateAction<boolean>>;
     setShowNotification: React.Dispatch<SetStateAction<boolean>>;
@@ -66,6 +67,7 @@ const PomodoroContext = createContext<PomodoroContext>({
         longBreak: LONG_BREAK_DURATION,
         longBreakInterval: LONG_BREAK_AFTER,
     },
+    resetPomodoro() {},
     setPhase() {},
     setIsRunning() {},
     setShowNotification() {},
@@ -158,7 +160,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
         });
     }
 
-    function resetTimer() {
+    function resetPomodoro() {
         setIsRunning(false);
         setIsDone(false);
         setDuration(initialDuration);
@@ -181,7 +183,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
     }, [showNotification]);
 
     useEffect(() => {
-        resetTimer();
+        resetPomodoro();
     }, [phase, settings]);
 
     useEffect(() => {
@@ -214,6 +216,7 @@ function PomodoroProvider({ children }: PomodoroProviderProps) {
                 focusCounter,
                 duration: { minutes, seconds },
                 settings,
+                resetPomodoro,
                 setPhase,
                 setIsRunning,
                 setShowNotification,
