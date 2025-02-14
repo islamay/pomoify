@@ -11,7 +11,6 @@ import {
 } from "./ui/dialog";
 import { DialogContent } from "./ui/dialog";
 import { PomodoroSettingForm } from "./forms/pomodoro-setting-form";
-import { Separator } from "./ui/separator";
 
 type PhaseProps = {
     children: React.ReactNode;

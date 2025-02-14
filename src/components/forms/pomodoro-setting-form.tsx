@@ -12,7 +12,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../button";
-import { DialogClose, DialogFooter } from "../ui/dialog";
+import { DialogClose } from "../ui/dialog";
 
 const formSchema = z.object({
     focus: z.coerce.number().min(1).max(60),
