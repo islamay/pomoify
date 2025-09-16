@@ -3,7 +3,7 @@
 Pomoify is Focus Management Tool for helping you to do task efficiently, it is free and open source under MIT License so you can modify and re-distribute
 
 
-You can access pomoify [here] (https://pomoify.netlify.app) or https://pomoify.netlify.app
+You can access pomoify [here](https://pomoify.netlify.app) or https://pomoify.netlify.app
 
 
 ## Manual instruction
