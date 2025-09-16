@@ -16,11 +16,13 @@ This section discuss how to setup pomoify at your local system after you have cl
 2. pnpm
 
 
+### Running locally
+
 1. Navigate to the project directory
 2. run the following command :
 ```cmd
 pnpm install 
 pnpm run dev
 ```
-
+3. Pomoify is running and the url can be accessed in the local network (well, depend on your firewall setting) 
 
